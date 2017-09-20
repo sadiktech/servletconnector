@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <servlet:connector name="Servlet" servletUrl="http://localhost:8087/HelloServletProject/SampleHelloServlet" validateConnections="true" doc:name="Servlet"/>
+    <servlet:endpoint connector-ref="Servlet" path="http://localhost:8087/HelloServletProject/SampleHelloServlet" name="Servlet1" responseTimeout="10000" doc:name="Servlet"/>
+    <http:request-config name="HTTP_Request_Configuration" host="localhost" port="8087" basePath="HelloServletProject" doc:name="HTTP Request Configuration"/>
+    <flow name="servletconnectorFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/Servlettest" allowedMethods="POST" doc:name="HTTP"/>
+        <byte-array-to-object-transformer returnClass="java.lang.String" doc:name="Byte Array to Object"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/SampleHelloServlet" method="GET" doc:name="HTTP">
+            <http:request-builder>
+                <http:query-param paramName="requestSample" value="#[payload]"/>
+            </http:request-builder>
+        </http:request>
+        <logger message="Payload in logs : #[payload]" level="INFO" doc:name="Logger"/>
+    </flow>
+</mule>
